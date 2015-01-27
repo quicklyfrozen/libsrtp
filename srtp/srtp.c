@@ -1444,7 +1444,7 @@ srtp_unprotect(srtp_ctx_t *ctx, void *srtp_hdr, int *pkt_octet_len) {
     
     /* check replay database */
     status = rdbx_check(&stream->rtp_rdbx, delta);
-    if (status)
+    if (status && stream->allow_repeat_tx==0)
       return status;
   }
 
@@ -2414,7 +2414,7 @@ srtp_unprotect_rtcp_aead (srtp_t ctx, srtp_stream_ctx_t *stream,
     seq_num = ntohl(*trailer) & SRTCP_INDEX_MASK;
     debug_print(mod_srtp, "srtcp index: %x", seq_num);
     status = rdb_check(&stream->rtcp_rdb, seq_num);
-    if (status) {
+    if (status && stream->allow_repeat_tx==0) {
         return status;
     }
 
@@ -2877,7 +2877,7 @@ srtp_unprotect_rtcp(srtp_t ctx, void *srtcp_hdr, int *pkt_octet_len) {
   seq_num = ntohl(*trailer) & SRTCP_INDEX_MASK;
   debug_print(mod_srtp, "srtcp index: %x", seq_num);
   status = rdb_check(&stream->rtcp_rdb, seq_num);
-  if (status)
+  if (status && stream->allow_repeat_tx==0)
     return status;
 
   /* 
